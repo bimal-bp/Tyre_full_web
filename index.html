@@ -748,7 +748,7 @@
                     <div id="moveTyreForm" class="form-section">
                         <h5>Move Tyre</h5>
                         <div class="move-instructions">
-                            <p><strong>Instructions:</strong> Select the target tipper and position where you want to move the tyre. If the target position has a tyre, they will be swapped.</p>
+                            <p><strong>Instructions:</strong> Select the target tipper and position where you want to move the tyre.</p>
                         </div>
                         <p>Moving tyre: <span id="selected-tyre-number" class="position-indicator"></span> from position: <span id="selected-position" class="position-indicator"></span> in tipper: <span id="selected-equipment" class="position-indicator"></span></p>
                         <div class="mb-3">
@@ -828,7 +828,6 @@
             let targetPosition = null;
             let targetEquipment = null;
             let actionModal = null;
-            let photoModal = null;
             let currentHmrKmrPhoto = null;
             let currentOldTyrePhoto = null;
             let currentAction = 'add'; // Default action
@@ -1098,7 +1097,7 @@
                     if (statusElement) statusElement.textContent = '';
                    
                     if (positionElement) {
-                        positionElement.classList.remove('empty', 'blasted');
+                        positionElement.classList.remove('empty', 'blasted', 'selected');
                     }
                 });
               
@@ -1130,6 +1129,7 @@
                         }
                     } else {
                         displayElement.textContent = '';
+                        statusElement.textContent = '';
                       
                         // Update visual state
                         positionElement.classList.add('empty');
@@ -1490,17 +1490,26 @@
               
                 // Get the tyre data
                 const fromTyre = dataFrom[fromPos].current;
-                const toTyre = dataTo[toPos].current;
-              
+                
                 // If no tyre to move
                 if (!fromTyre) {
                     alert('No tyre to move from this position');
                     return;
                 }
-              
-                // Swap the tyres
-                dataFrom[fromPos].current = toTyre; // Set source to target tyre (or null if empty)
-                dataTo[toPos].current = fromTyre;   // Set target to source tyre
+                
+                // If moving to a position that already has a tyre, move that tyre to the original position (swap)
+                const toTyre = dataTo[toPos].current;
+                
+                if (toTyre) {
+                    // Swap tyres - move target tyre to source position
+                    dataFrom[fromPos].current = toTyre;
+                } else {
+                    // Empty the source position
+                    dataFrom[fromPos].current = null;
+                }
+                
+                // Move source tyre to target position
+                dataTo[toPos].current = fromTyre;
               
                 // Save to localStorage
                 saveEquipmentData(fromEq, dataFrom);
