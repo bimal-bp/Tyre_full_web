@@ -1,1 +1,1838 @@
-<h> jfj</h>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tyre Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #e74c3c;
+            --accent: #3498db;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+       
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            display: flex;
+        }
+       
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-right: 20px;
+            height: calc(100vh - 40px);
+            position: sticky;
+            top: 20px;
+            overflow-y: auto;
+        }
+       
+        .main-content {
+            flex: 1;
+        }
+       
+        .sidebar-title {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+       
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+       
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+       
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+       
+        .sidebar-menu a:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+       
+        .sidebar-menu a.active {
+            background-color: var(--accent);
+        }
+       
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+       
+        .tyre-position {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--light);
+            border: 2px solid var(--primary);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+       
+        .tyre-position:hover {
+            transform: scale(1.05);
+            background-color: var(--accent);
+            color: white;
+        }
+       
+        .tyre-position.selected {
+            background-color: var(--accent);
+            color: white;
+        }
+       
+        .tyre-position.empty {
+            background-color: #f8d7da;
+        }
+       
+        .tyre-position.blasted {
+            background-color: #ffcccc;
+            border: 2px dashed var(--secondary);
+        }
+       
+        .tyre-number-display {
+            font-size: 10px;
+            text-align: center;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 5px;
+        }
+       
+        .position-label {
+            font-size: 10px;
+            margin-top: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+       
+        .axle-label {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+       
+        .axle-separator {
+            height: 2px;
+            background-color: #ccc;
+            margin: 10px 0;
+        }
+       
+        .tipper-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+       
+        .axle-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+       
+        .tipper-diagram {
+            background-color: #f0f8ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+       
+        .equipment-management {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+       
+        .tyre-input {
+            max-width: 200px;
+            margin: 0 auto;
+        }
+       
+        .selected-position {
+            background-color: var(--accent);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+       
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+       
+        .modal-content {
+            border-radius: 10px;
+        }
+       
+        .modal-header {
+            background-color: var(--primary);
+            color: white;
+        }
+       
+        .photo-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+       
+        .photo-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+       
+        .tyre-history {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+       
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+       
+        .history-item:last-child {
+            border-bottom: none;
+        }
+       
+        .scrap-reason {
+            background-color: #fff3cd;
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-top: 5px;
+            font-size: 13px;
+        }
+       
+        /* Move tyre specific styles */
+        .move-controls {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+       
+        .position-option {
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+       
+        .position-option:hover {
+            background-color: #dee2e6;
+        }
+       
+        .positions-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+       
+        .move-instructions {
+            background-color: #e7f5ff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--accent);
+        }
+       
+        .position-indicator {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .running-totals {
+            background-color: #e7f5ff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .running-totals div {
+            margin-bottom: 5px;
+        }
+        
+        .form-section {
+            display: none;
+        }
+        
+        .active-form {
+            display: block;
+        }
+        
+        .photo-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .gallery-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .gallery-img:hover {
+            transform: scale(1.1);
+        }
+        
+        .modal-img {
+            max-width: 100%;
+            max-height: 80vh;
+        }
+        
+        .scrap-list {
+            margin-top: 20px;
+        }
+        
+        .scrap-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .scrap-item:last-child {
+            border-bottom: none;
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .active-content {
+            display: block;
+        }
+        
+        .action-card {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .scrap-filters {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .scrap-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .summary-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        .summary-label {
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .efficiency-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .efficiency-good {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .efficiency-average {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .efficiency-poor {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .tyre-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .info-card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .info-title {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-title">
+            <h4>Tyre Management</h4>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active" data-section="equipment-view"><i class="fas fa-truck"></i> Equipment View</a></li>
+            <li><a href="#" data-section="scrap-tyres"><i class="fas fa-trash-alt"></i> Scrap Tyres</a></li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Equipment View Section -->
+        <div id="equipment-view" class="content-section active-content">
+            <h1 class="text-center mb-4">Tyre Management System</h1>
+           
+            <!-- Equipment Selection -->
+            <div class="equipment-management">
+                <h3>Equipment Selection</h3>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="equipmentSelect" class="form-label">Select Equipment</label>
+                        <select class="form-select" id="equipmentSelect">
+                            <option value="">-- Select Equipment --</option>
+                            <option value="AP39UUQ095">AP39UUQ095</option>
+                            <option value="AP39UUQ097">AP39UUQ097</option>
+                            <option value="AP39UW9808">AP39UW9808</option>
+                            <option value="AP39UW9811">AP39UW9811</option>
+                            <option value="AP39UUQ451">AP39UUQ451</option>
+                            <option value="AP39YU4652">AP39YU4652</option>
+                            <option value="AP39WC0921">AP39WC0921</option>
+                            <option value="AP39WC0924">AP39WC0924</option>
+                            <option value="AP39WC0928">AP39WC0928</option>
+                            <option value="AP39WF2057">AP39WF2057</option>
+                            <option value="AP39WF2051">AP39WF2051</option>
+                            <option value="AP39WF2052">AP39WF2052</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="selected-position">
+                            Selected Position: <span id="selectedPosition">None</span>
+                        </div>
+                        <div id="currentTyreInfo" class="mt-2"></div>
+                    </div>
+                </div>
+                
+                <!-- Current Tyre Running Totals -->
+                <div id="runningTotals" class="running-totals" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="info-card">
+                                <div class="info-title">STT KMR</div>
+                                <div class="info-value" id="sttKmr">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-card">
+                                <div class="info-title">STT HMR</div>
+                                <div class="info-value" id="sttHmr">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-card">
+                                <div class="info-title">Close KMR</div>
+                                <div class="info-value" id="closeKmr">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-card">
+                                <div class="info-title">Close HMR</div>
+                                <div class="info-value" id="closeHmr">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <div class="info-card">
+                                <div class="info-title">Efficiency (KMR/HMR)</div>
+                                <div class="info-value" id="efficiencyValue">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            <!-- Tipper Diagram -->
+            <div class="tipper-diagram">
+                <div class="tipper-layout">
+                    <!-- Front Axle -->
+                    <div class="axle-row">
+                        <div class="tyre-container">
+                            <div class="tyre-position" data-position="FR-LEFT">
+                                <div>FL</div>
+                                <div class="tyre-number-display" id="position-FR-LEFT-number"></div>
+                            </div>
+                            <div class="position-label">FR-LEFT</div>
+                        </div>
+                        <div class="tyre-container">
+                            <div class="tyre-position" data-position="FR-RIGHT">
+                                <div>FR</div>
+                                <div class="tyre-number-display" id="position-FR-RIGHT-number"></div>
+                            </div>
+                            <div class="position-label">FR-RIGHT</div>
+                        </div>
+                    </div>
+                   
+                    <!-- Center Axles -->
+                    <div class="axle-separator"></div>
+                    <div class="axle-row">
+                        <div class="tyre-container">
+                            <div class="tyre-position" data-position="CLI">
+                                <div>CLI</div>
+                                <div class="tyre-number-display" id="position-CLI-number"></div>
+                            </div>
+                            <div class="position-label">Center Left In</div>
+                        </div>
+                        <div class="tyre-container">
+                            <div class="tyre-position" data-position="CLO">
+                                <div>CLO</div>
+                                <div class="tyre-number-display" id="position-CLO-number"></div>
+                            </div>
+                            <div class="position-label">Center Left Out</div>
+                        </div>
+                        <div class="tyre-container">
+                            <div class="tyre-position" data-position="CRI">
+                                <div>CRI</div>
+                                <div class="tyre-number-display" id="position-CRI-number"></div>
+                            </div>
+                            <div class="position-label">Center Right In</div>
+                        </div>
+                        <div class="tyre-container">
+                            <div class="tyre-position" data-position="CRO">
+                                <div>CRO</div>
+                                <div class="tyre-number-display" id="position-CRO-number"></div>
+                            </div>
+                            <div class="position-label">Center Right Out</div>
+                        </div>
+                    </div>
+                   
+                    <!-- Rear Axle -->
+                    <div class="axle-separator"></div>
+                    <div class="axle-row">
+                        <div class="tyre-container">
+                            <div class="tyre-position" data-position="BLI">
+                                <div>BLI</div>
+                                <div class="tyre-number-display" id="position-BLI-number"></div>
+                            </div>
+                            <div class="position-label">Back Left In</div>
+                        </div>
+                        <div class="tyre-container">
+                            <div class="tyre-position" data-position="BLO">
+                                <div>BLO</div>
+                                <div class="tyre-number-display" id="position-BLO-number"></div>
+                            </div>
+                            <div class="position-label">Back Left Out</div>
+                        </div>
+                        <div class="tyre-container">
+                            <div class="tyre-position" data-position="BRI">
+                                <div>BRI</div>
+                                <div class="tyre-number-display" id="position-BRI-number"></div>
+                            </div>
+                            <div class="position-label">Back Right In</div>
+                        </div>
+                        <div class="tyre-container">
+                            <div class="tyre-position" data-position="BRO">
+                                <div>BRO</div>
+                                <div class="tyre-number-display" id="position-BRO-number"></div>
+                            </div>
+                            <div class="position-label">Back Right Out</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scrap Tyres Section -->
+        <div id="scrap-tyres" class="content-section">
+            <h2 class="mb-4">Scrap Tyres</h2>
+            
+            <div class="scrap-filters">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="scrapEquipmentSelect" class="form-label">Filter by Equipment</label>
+                        <select class="form-select" id="scrapEquipmentSelect">
+                            <option value="">-- All Equipment --</option>
+                            <option value="AP39UUQ095">AP39UUQ095</option>
+                            <option value="AP39UUQ097">AP39UUQ097</option>
+                            <option value="AP39UW9808">AP39UW9808</option>
+                            <option value="AP39UW9811">AP39UW9811</option>
+                            <option value="AP39UUQ451">AP39UUQ451</option>
+                            <option value="AP39YU4652">AP39YU4652</option>
+                            <option value="AP39WC0921">AP39WC0921</option>
+                            <option value="AP39WC0924">AP39WC0924</option>
+                            <option value="AP39WC0928">AP39WC0928</option>
+                            <option value="AP39WF2057">AP39WF2057</option>
+                            <option value="AP39WF2051">AP39WF2051</option>
+                            <option value="AP39WF2052">AP39WF2052</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="scrapReasonFilter" class="form-label">Filter by Reason</label>
+                        <select class="form-select" id="scrapReasonFilter">
+                            <option value="">-- All Reasons --</option>
+                            <option value="blast">Blast</option>
+                            <option value="puncture">Puncture</option>
+                            <option value="damaged">Damaged</option>
+                            <option value="wear">Normal Wear</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="scrap-summary" id="scrapSummary">
+                <div class="summary-card">
+                    <div class="summary-value" id="totalScrapCount">0</div>
+                    <div class="summary-label">Total Scrap Tyres</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value" id="blastCount">0</div>
+                    <div class="summary-label">Blast Tyres</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value" id="punctureCount">0</div>
+                    <div class="summary-label">Puncture Tyres</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value" id="wearCount">0</div>
+                    <div class="summary-label">Wear Tyres</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div id="scrapTyreList" class="scrap-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Modal -->
+    <div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="actionModalLabel">Tyre Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Managing tyre for position: <strong id="modalPosition"></strong></p>
+                   
+                    <!-- Current Tyre Info -->
+                    <div id="currentTyreDetails" class="mb-3 p-3 bg-light rounded"></div>
+                   
+                    <!-- Action Selection -->
+                    <div class="mb-4">
+                        <h5>Select Action</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card action-card h-100 text-center" data-action="add">
+                                    <div class="card-body">
+                                        <i class="fas fa-plus-circle fa-3x mb-3 text-primary"></i>
+                                        <h5 class="card-title">Add New Tyre</h5>
+                                        <p class="card-text">Add a completely new tyre to this position</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card action-card h-100 text-center" data-action="move">
+                                    <div class="card-body">
+                                        <i class="fas fa-exchange-alt fa-3x mb-3 text-warning"></i>
+                                        <h5 class="card-title">Move Tyre</h5>
+                                        <p class="card-text">Move this tyre to another position</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card action-card h-100 text-center" data-action="reuse">
+                                    <div class="card-body">
+                                        <i class="fas fa-redo fa-3x mb-3 text-success"></i>
+                                        <h5 class="card-title">Reuse Tyre</h5>
+                                        <p class="card-text">Reuse a tyre from scrap or another equipment</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <!-- New Tyre Form -->
+                    <div id="newTyreForm" class="form-section">
+                        <h5>Add New Tyre</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="tyreNumber" class="form-label">Tyre Number *</label>
+                                    <input type="text" class="form-control" id="tyreNumber" required>
+                                    <div class="form-text">Format: AP39UE8838 (will be auto-generated if empty)</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="issueDate" class="form-label">Issue Date *</label>
+                                    <input type="date" class="form-control" id="issueDate" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="sttKmrInput" class="form-label">STT KMR *</label>
+                                    <input type="number" class="form-control" id="sttKmrInput" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="sttHmrInput" class="form-label">STT HMR *</label>
+                                    <input type="number" class="form-control" id="sttHmrInput" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="closeKmrInput" class="form-label">Close KMR</label>
+                                    <input type="number" class="form-control" id="closeKmrInput">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="closeHmrInput" class="form-label">Close HMR</label>
+                                    <input type="number" class="form-control" id="closeHmrInput">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="scrapReason" class="form-label">Reason for Replacement *</label>
+                                    <select class="form-select" id="scrapReason" required>
+                                        <option value="">-- Select Reason --</option>
+                                        <option value="blast">Blast</option>
+                                        <option value="puncture">Puncture</option>
+                                        <option value="damaged">Damaged</option>
+                                        <option value="wear">Normal Wear</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="hmrKmrPhoto" class="form-label">HMR/KMR Photo</label>
+                                    <input type="file" class="form-control" id="hmrKmrPhoto" accept="image/*">
+                                    <div class="form-text">Photo of the meter readings</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="oldTyrePhoto" class="form-label">Old Tyre Photo</label>
+                                    <input type="file" class="form-control" id="oldTyrePhoto" accept="image/*">
+                                    <div class="form-text">Photo showing the condition of the old tyre</div>
+                                </div>
+                            </div>
+                        </div>
+                       
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Additional Notes</label>
+                            <textarea class="form-control" id="notes" rows="2"></textarea>
+                        </div>
+                       
+                        <div class="photo-container" id="photoPreviews"></div>
+                        
+                        <!-- Efficiency Display -->
+                        <div id="efficiencyDisplay" class="mt-3 p-3 bg-light rounded" style="display: none;">
+                            <h6>Efficiency Calculation</h6>
+                            <div>KMR Difference: <span id="kmrDiff">0</span></div>
+                            <div>HMR Difference: <span id="hmrDiff">0</span></div>
+                            <div>Efficiency (KMR/HMR): <span id="efficiencyCalc">0</span></div>
+                        </div>
+                    </div>
+                   
+                    <!-- Move Tyre Controls -->
+                    <div id="moveTyreForm" class="form-section">
+                        <h5>Move Tyre</h5>
+                        <div class="move-instructions">
+                            <p><strong>Instructions:</strong> Select the position where you want to move the tyre. If the target position has a tyre, they will be swapped.</p>
+                        </div>
+                        <p>Moving tyre: <span id="selected-tyre-number" class="position-indicator"></span> from position: <span id="selected-position" class="position-indicator"></span></p>
+                        <p>Select target position:</p>
+                        <div class="positions-container" id="target-positions">
+                            <!-- Target positions will be populated here -->
+                        </div>
+                        <div class="mt-3">
+                            <button id="confirm-move" class="btn btn-success">Confirm Move</button>
+                            <button id="cancel-move" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Reuse Tyre Form -->
+                    <div id="reuseTyreForm" class="form-section">
+                        <h5>Reuse Tyre</h5>
+                        <div class="mb-3">
+                            <label for="scrapTyreSelect" class="form-label">Select Tyre to Reuse</label>
+                            <select class="form-select" id="scrapTyreSelect">
+                                <option value="">-- Select Tyre --</option>
+                                <!-- Options will be populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reuseIssueDate" class="form-label">Reuse Date *</label>
+                            <input type="date" class="form-control" id="reuseIssueDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reuseSttKmr" class="form-label">Current STT KMR *</label>
+                            <input type="number" class="form-control" id="reuseSttKmr" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reuseSttHmr" class="form-label">Current STT HMR *</label>
+                            <input type="number" class="form-control" id="reuseSttHmr" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reuseCloseKmr" class="form-label">Current Close KMR</label>
+                            <input type="number" class="form-control" id="reuseCloseKmr">
+                        </div>
+                        <div class="mb-3">
+                            <label for="reuseCloseHmr" class="form-label">Current Close HMR</label>
+                            <input type="number" class="form-control" id="reuseCloseHmr">
+                        </div>
+                        <div class="mb-3">
+                            <label for="reuseNotes" class="form-label">Additional Notes</label>
+                            <textarea class="form-control" id="reuseNotes" rows="2"></textarea>
+                        </div>
+                        <div class="mt-3">
+                            <button id="confirm-reuse" class="btn btn-success">Confirm Reuse</button>
+                            <button id="cancel-reuse" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveTyreBtn">Save New Tyre</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Photo Modal -->
+    <div class="modal fade" id="photoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Photo Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="" class="modal-img" id="modalPhoto" alt="Enlarged photo">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize variables
+            let selectedEquipment = null;
+            let selectedPosition = null;
+            let targetPosition = null;
+            let actionModal = null;
+            let photoModal = null;
+            let currentHmrKmrPhoto = null;
+            let currentOldTyrePhoto = null;
+            let currentAction = 'add'; // Default action
+           
+            // DOM Elements
+            const equipmentSelect = document.getElementById('equipmentSelect');
+            const scrapEquipmentSelect = document.getElementById('scrapEquipmentSelect');
+            const scrapReasonFilter = document.getElementById('scrapReasonFilter');
+            const selectedPositionSpan = document.getElementById('selectedPosition');
+            const currentTyreInfoDiv = document.getElementById('currentTyreInfo');
+            const scrapTyreListDiv = document.getElementById('scrapTyreList');
+            const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+            const contentSections = document.querySelectorAll('.content-section');
+            const actionCards = document.querySelectorAll('.action-card');
+            const runningTotalsDiv = document.getElementById('runningTotals');
+           
+            // Running totals elements
+            const sttKmrSpan = document.getElementById('sttKmr');
+            const sttHmrSpan = document.getElementById('sttHmr');
+            const closeKmrSpan = document.getElementById('closeKmr');
+            const closeHmrSpan = document.getElementById('closeHmr');
+            const efficiencyValueSpan = document.getElementById('efficiencyValue');
+            
+            // Efficiency display elements
+            const kmrDiffSpan = document.getElementById('kmrDiff');
+            const hmrDiffSpan = document.getElementById('hmrDiff');
+            const efficiencyCalcSpan = document.getElementById('efficiencyCalc');
+            const efficiencyDisplayDiv = document.getElementById('efficiencyDisplay');
+           
+            // Modal elements
+            const modalPositionSpan = document.getElementById('modalPosition');
+            const currentTyreDetailsDiv = document.getElementById('currentTyreDetails');
+            const tyreNumberInput = document.getElementById('tyreNumber');
+            const issueDateInput = document.getElementById('issueDate');
+            const sttKmrInput = document.getElementById('sttKmrInput');
+            const sttHmrInput = document.getElementById('sttHmrInput');
+            const closeKmrInput = document.getElementById('closeKmrInput');
+            const closeHmrInput = document.getElementById('closeHmrInput');
+            const scrapReasonSelect = document.getElementById('scrapReason');
+            const hmrKmrPhotoInput = document.getElementById('hmrKmrPhoto');
+            const oldTyrePhotoInput = document.getElementById('oldTyrePhoto');
+            const notesInput = document.getElementById('notes');
+            const photoPreviewsDiv = document.getElementById('photoPreviews');
+            const saveTyreBtn = document.getElementById('saveTyreBtn');
+            const selectedTyreNumberSpan = document.getElementById('selected-tyre-number');
+            const selectedPositionSpanMove = document.getElementById('selected-position');
+            const targetPositionsContainer = document.getElementById('target-positions');
+            const confirmMoveBtn = document.getElementById('confirm-move');
+            const cancelMoveBtn = document.getElementById('cancel-move');
+            const scrapTyreSelect = document.getElementById('scrapTyreSelect');
+            const reuseIssueDateInput = document.getElementById('reuseIssueDate');
+            const reuseSttKmrInput = document.getElementById('reuseSttKmr');
+            const reuseSttHmrInput = document.getElementById('reuseSttHmr');
+            const reuseCloseKmrInput = document.getElementById('reuseCloseKmr');
+            const reuseCloseHmrInput = document.getElementById('reuseCloseHmr');
+            const reuseNotesInput = document.getElementById('reuseNotes');
+            const confirmReuseBtn = document.getElementById('confirm-reuse');
+            const cancelReuseBtn = document.getElementById('cancel-reuse');
+            const modalPhoto = document.getElementById('modalPhoto');
+            
+            // Scrap summary elements
+            const totalScrapCount = document.getElementById('totalScrapCount');
+            const blastCount = document.getElementById('blastCount');
+            const punctureCount = document.getElementById('punctureCount');
+            const wearCount = document.getElementById('wearCount');
+           
+            // Initialize modals
+            actionModal = new bootstrap.Modal(document.getElementById('actionModal'));
+            photoModal = new bootstrap.Modal(document.getElementById('photoModal'));
+           
+            // Set current date as default for issue date
+            issueDateInput.valueAsDate = new Date();
+            reuseIssueDateInput.valueAsDate = new Date();
+            
+            // Generate tyre number if empty
+            function generateTyreNumber() {
+                const prefix = "AP39";
+                const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                const numbers = "0123456789";
+                
+                // Generate random 2 letters
+                let tyreNum = prefix;
+                for (let i = 0; i < 2; i++) {
+                    tyreNum += letters.charAt(Math.floor(Math.random() * letters.length));
+                }
+                
+                // Generate random 4 numbers
+                for (let i = 0; i < 4; i++) {
+                    tyreNum += numbers.charAt(Math.floor(Math.random() * numbers.length));
+                }
+                
+                return tyreNum;
+            }
+            
+            // Calculate efficiency
+            function calculateEfficiency(sttKmr, sttHmr, closeKmr, closeHmr) {
+                if (!closeKmr || !closeHmr || !sttKmr || !sttHmr) {
+                    return {
+                        kmrDiff: 0,
+                        hmrDiff: 0,
+                        efficiency: 0
+                    };
+                }
+                
+                const kmrDiff = closeKmr - sttKmr;
+                const hmrDiff = closeHmr - sttHmr;
+                const efficiency = hmrDiff > 0 ? (kmrDiff / hmrDiff).toFixed(2) : 0;
+                
+                return {
+                    kmrDiff: kmrDiff,
+                    hmrDiff: hmrDiff,
+                    efficiency: efficiency
+                };
+            }
+           
+            // Event Listeners
+            equipmentSelect.addEventListener('change', function() {
+                selectedEquipment = this.value;
+                if (selectedEquipment) {
+                    loadTyreData();
+                    // Hide running totals initially
+                    runningTotalsDiv.style.display = 'none';
+                }
+            });
+            
+            scrapEquipmentSelect.addEventListener('change', function() {
+                loadScrapTyres(this.value, scrapReasonFilter.value);
+            });
+            
+            scrapReasonFilter.addEventListener('change', function() {
+                loadScrapTyres(scrapEquipmentSelect.value, this.value);
+            });
+            
+            // Sidebar navigation
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Update active link
+                    sidebarLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding section
+                    const sectionId = this.getAttribute('data-section');
+                    contentSections.forEach(section => {
+                        section.classList.remove('active-content');
+                    });
+                    document.getElementById(sectionId).classList.add('active-content');
+                    
+                    // If scrap tyres section is selected, load scrap tyres
+                    if (sectionId === 'scrap-tyres') {
+                        loadScrapTyres(scrapEquipmentSelect.value, scrapReasonFilter.value);
+                    }
+                });
+            });
+            
+            // Action cards
+            actionCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const action = this.getAttribute('data-action');
+                    showForm(action);
+                });
+            });
+           
+            // Add click event to all tyre positions
+            document.querySelectorAll('.tyre-position').forEach(position => {
+                position.addEventListener('click', function() {
+                    if (!selectedEquipment) {
+                        alert('Please select equipment first');
+                        return;
+                    }
+                   
+                    // Update selected position
+                    selectedPosition = this.dataset.position;
+                    selectedPositionSpan.textContent = selectedPosition;
+                   
+                    // Highlight selected position
+                    document.querySelectorAll('.tyre-position').forEach(p => {
+                        p.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                   
+                    // Show current tyre info
+                    showCurrentTyreInfo();
+                   
+                    // Show action modal
+                    modalPositionSpan.textContent = selectedPosition;
+                   
+                    // Reset form and show action selection by default
+                    resetTyreForm();
+                    showForm('selection');
+                   
+                    // Show modal
+                    actionModal.show();
+                });
+            });
+           
+            // Handle photo upload previews
+            hmrKmrPhotoInput.addEventListener('change', function(e) {
+                handlePhotoPreview(e, 'hmrKmr');
+            });
+           
+            oldTyrePhotoInput.addEventListener('change', function(e) {
+                handlePhotoPreview(e, 'oldTyre');
+            });
+           
+            // Save tyre button
+            saveTyreBtn.addEventListener('click', function() {
+                if (!validateTyreForm()) {
+                    return;
+                }
+               
+                saveTyreData();
+                actionModal.hide();
+            });
+           
+            // Move tyre buttons
+            confirmMoveBtn.addEventListener('click', function() {
+                if (!targetPosition) {
+                    alert('Please select a target position first');
+                    return;
+                }
+               
+                moveTyre(selectedPosition, targetPosition);
+                actionModal.hide();
+            });
+           
+            cancelMoveBtn.addEventListener('click', function() {
+                showForm('selection');
+            });
+            
+            // Reuse tyre buttons
+            confirmReuseBtn.addEventListener('click', function() {
+                if (!scrapTyreSelect.value) {
+                    alert('Please select a tyre to reuse');
+                    return;
+                }
+                
+                reuseTyre();
+                actionModal.hide();
+            });
+            
+            cancelReuseBtn.addEventListener('click', function() {
+                showForm('selection');
+            });
+            
+            // Auto-generate tyre number if empty
+            tyreNumberInput.addEventListener('focusout', function() {
+                if (!this.value.trim()) {
+                    this.value = generateTyreNumber();
+                }
+            });
+            
+            // Calculate efficiency when close KMR/HMR changes
+            closeKmrInput.addEventListener('input', updateEfficiencyDisplay);
+            closeHmrInput.addEventListener('input', updateEfficiencyDisplay);
+            
+            // Update efficiency display
+            function updateEfficiencyDisplay() {
+                const sttKmr = parseInt(sttKmrInput.value) || 0;
+                const sttHmr = parseInt(sttHmrInput.value) || 0;
+                const closeKmr = parseInt(closeKmrInput.value) || 0;
+                const closeHmr = parseInt(closeHmrInput.value) || 0;
+                
+                if (sttKmr > 0 && sttHmr > 0 && closeKmr > 0 && closeHmr > 0) {
+                    const efficiency = calculateEfficiency(sttKmr, sttHmr, closeKmr, closeHmr);
+                    kmrDiffSpan.textContent = efficiency.kmrDiff;
+                    hmrDiffSpan.textContent = efficiency.hmrDiff;
+                    efficiencyCalcSpan.textContent = efficiency.efficiency;
+                    efficiencyDisplayDiv.style.display = 'block';
+                } else {
+                    efficiencyDisplayDiv.style.display = 'none';
+                }
+            }
+           
+            // Functions
+            function getEquipmentData() {
+                const defaultData = {
+                    "FR-LEFT": { current: null, history: [] },
+                    "FR-RIGHT": { current: null, history: [] },
+                    "CLI": { current: null, history: [] },
+                    "CLO": { current: null, history: [] },
+                    "CRI": { current: null, history: [] },
+                    "CRO": { current: null, history: [] },
+                    "BLI": { current: null, history: [] },
+                    "BLO": { current: null, history: [] },
+                    "BRI": { current: null, history: [] },
+                    "BRO": { current: null, history: [] }
+                };
+                
+                const storedData = localStorage.getItem(`tyres_${selectedEquipment}`);
+                if (storedData) {
+                    return JSON.parse(storedData);
+                }
+                
+                // Initialize with some sample data for demo
+                const sampleData = {...defaultData};
+                sampleData["FR-LEFT"].current = {
+                    tyreNumber: generateTyreNumber(),
+                    issueDate: new Date(Date.now() - 30*24*60*60*1000).toISOString(),
+                    sttKmr: 10000,
+                    sttHmr: 500,
+                    closeKmr: 12500,
+                    closeHmr: 850,
+                    scrapReason: "wear",
+                    notes: "Initial tyre"
+                };
+                
+                // Calculate efficiency for sample tyre
+                const efficiency = calculateEfficiency(
+                    sampleData["FR-LEFT"].current.sttKmr,
+                    sampleData["FR-LEFT"].current.sttHmr,
+                    sampleData["FR-LEFT"].current.closeKmr,
+                    sampleData["FR-LEFT"].current.closeHmr
+                );
+                sampleData["FR-LEFT"].current.efficiency = efficiency.efficiency;
+                
+                // Add some scrap tyres for demo
+                sampleData["FR-LEFT"].history = [
+                    {
+                        tyreNumber: generateTyreNumber(),
+                        issueDate: new Date(Date.now() - 90*24*60*60*1000).toISOString(),
+                        removalDate: new Date(Date.now() - 31*24*60*60*1000).toISOString(),
+                        sttKmr: 8000,
+                        sttHmr: 400,
+                        closeKmr: 12000,
+                        closeHmr: 800,
+                        scrapReason: "blast",
+                        notes: "Blasted on site"
+                    }
+                ];
+                
+                saveEquipmentData(sampleData);
+                return sampleData;
+            }
+           
+            function saveEquipmentData(data) {
+                localStorage.setItem(`tyres_${selectedEquipment}`, JSON.stringify(data));
+            }
+           
+            function loadTyreData() {
+                const equipmentData = getEquipmentData();
+               
+                // Update all position displays
+                for (const [position, data] of Object.entries(equipmentData)) {
+                    const displayElement = document.getElementById(`position-${position}-number`);
+                    if (displayElement) {
+                        if (data.current) {
+                            displayElement.textContent = data.current.tyreNumber;
+                           
+                            // Update visual state
+                            const positionElement = document.querySelector(`[data-position="${position}"]`);
+                            if (positionElement) {
+                                positionElement.classList.remove('empty');
+                               
+                                // Add blasted class if the reason was blast
+                                if (data.current.scrapReason === 'blast') {
+                                    positionElement.classList.add('blasted');
+                                } else {
+                                    positionElement.classList.remove('blasted');
+                                }
+                            }
+                        } else {
+                            displayElement.textContent = '';
+                           
+                            // Update visual state
+                            const positionElement = document.querySelector(`[data-position="${position}"]`);
+                            if (positionElement) {
+                                positionElement.classList.add('empty');
+                                positionElement.classList.remove('blasted');
+                            }
+                        }
+                    }
+                }
+                
+                // Calculate running totals for the equipment
+                calculateRunningTotals(equipmentData);
+            }
+            
+            function calculateRunningTotals(equipmentData) {
+                let totalSttKmr = 0;
+                let totalSttHmr = 0;
+                let totalCloseKmr = 0;
+                let totalCloseHmr = 0;
+                let tyreCount = 0;
+                
+                for (const [position, data] of Object.entries(equipmentData)) {
+                    if (data.current) {
+                        totalSttKmr += data.current.sttKmr || 0;
+                        totalSttHmr += data.current.sttHmr || 0;
+                        totalCloseKmr += data.current.closeKmr || 0;
+                        totalCloseHmr += data.current.closeHmr || 0;
+                        tyreCount++;
+                    }
+                }
+                
+                if (tyreCount > 0) {
+                    // Update display
+                    sttKmrSpan.textContent = totalSttKmr.toLocaleString();
+                    sttHmrSpan.textContent = totalSttHmr.toLocaleString();
+                    closeKmrSpan.textContent = totalCloseKmr.toLocaleString();
+                    closeHmrSpan.textContent = totalCloseHmr.toLocaleString();
+                    
+                    // Calculate overall efficiency
+                    const kmrDiff = totalCloseKmr - totalSttKmr;
+                    const hmrDiff = totalCloseHmr - totalSttHmr;
+                    const efficiency = hmrDiff > 0 ? (kmrDiff / hmrDiff).toFixed(2) : 0;
+                    efficiencyValueSpan.textContent = efficiency;
+                    
+                    // Show running totals
+                    runningTotalsDiv.style.display = 'block';
+                } else {
+                    runningTotalsDiv.style.display = 'none';
+                }
+            }
+           
+            function showCurrentTyreInfo() {
+                const equipmentData = getEquipmentData();
+                const currentTyre = equipmentData[selectedPosition].current;
+               
+                if (currentTyre) {
+                    currentTyreInfoDiv.innerHTML = `
+                        <strong>Current Tyre:</strong> ${currentTyre.tyreNumber}<br>
+                        <small>Issued: ${formatDate(currentTyre.issueDate)} | STT KMR: ${currentTyre.sttKmr || 'N/A'} | STT HMR: ${currentTyre.sttHmr || 'N/A'}</small>
+                        ${currentTyre.efficiency ? `<span class="efficiency-badge efficiency-good">Eff: ${currentTyre.efficiency}</span>` : ''}
+                    `;
+                   
+                    // Show current tyre details in modal
+                    const efficiencyInfo = calculateEfficiency(
+                        currentTyre.sttKmr, 
+                        currentTyre.sttHmr, 
+                        currentTyre.closeKmr, 
+                        currentTyre.closeHmr
+                    );
+                    
+                    currentTyreDetailsDiv.innerHTML = `
+                        <h6>Current Tyre Details</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div><strong>Tyre Number:</strong> ${currentTyre.tyreNumber}</div>
+                                <div><strong>Issue Date:</strong> ${formatDate(currentTyre.issueDate)}</div>
+                                <div><strong>STT KMR:</strong> ${currentTyre.sttKmr || 'N/A'}</div>
+                                <div><strong>STT HMR:</strong> ${currentTyre.sttHmr || 'N/A'}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div><strong>Close KMR:</strong> ${currentTyre.closeKmr || 'N/A'}</div>
+                                <div><strong>Close HMR:</strong> ${currentTyre.closeHmr || 'N/A'}</div>
+                                <div><strong>Efficiency:</strong> ${efficiencyInfo.efficiency}</div>
+                                <div><strong>Reason:</strong> ${getReasonText(currentTyre.scrapReason)}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    currentTyreInfoDiv.innerHTML = `<span class="text-muted">No tyre assigned to this position</span>`;
+                    currentTyreDetailsDiv.innerHTML = `<span class="text-muted">No current tyre</span>`;
+                }
+            }
+            
+            function loadScrapTyres(equipmentId, reasonFilter) {
+                let scrapTyres = [];
+                let blastCountVal = 0;
+                let punctureCountVal = 0;
+                let wearCountVal = 0;
+                
+                // Get all equipment IDs
+                const allEquipment = [
+                    "AP39UUQ095", "AP39UUQ097", "AP39UW9808", "AP39UW9811", 
+                    "AP39UUQ451", "AP39YU4652", "AP39WC0921", "AP39WC0924", 
+                    "AP39WC0928", "AP39WF2057", "AP39WF2051", "AP39WF2052"
+                ];
+                
+                // If equipment filter is specified, use only that equipment
+                const equipmentToCheck = equipmentId ? [equipmentId] : allEquipment;
+                
+                equipmentToCheck.forEach(eq => {
+                    const equipmentData = getEquipmentDataForEquipment(eq);
+                    for (const [position, data] of Object.entries(equipmentData)) {
+                        if (data.history) {
+                            data.history.forEach(item => {
+                                // Apply reason filter if specified
+                                if (reasonFilter && item.scrapReason !== reasonFilter) {
+                                    return;
+                                }
+                                
+                                scrapTyres.push({
+                                    equipment: eq,
+                                    position: position,
+                                    ...item
+                                });
+                                
+                                // Count by reason
+                                if (item.scrapReason === 'blast') blastCountVal++;
+                                if (item.scrapReason === 'puncture') punctureCountVal++;
+                                if (item.scrapReason === 'wear') wearCountVal++;
+                            });
+                        }
+                    }
+                });
+                
+                // Update summary counts
+                totalScrapCount.textContent = scrapTyres.length;
+                blastCount.textContent = blastCountVal;
+                punctureCount.textContent = punctureCountVal;
+                wearCount.textContent = wearCountVal;
+                
+                if (scrapTyres.length === 0) {
+                    scrapTyreListDiv.innerHTML = '<div class="text-muted">No scrap tyres found</div>';
+                    return;
+                }
+                
+                // Sort by removal date (most recent first)
+                scrapTyres.sort((a, b) => {
+                    const dateA = a.removalDate ? new Date(a.removalDate) : new Date(0);
+                    const dateB = b.removalDate ? new Date(b.removalDate) : new Date(0);
+                    return dateB - dateA;
+                });
+                
+                let scrapHTML = '';
+                scrapTyres.forEach(item => {
+                    scrapHTML += `
+                        <div class="scrap-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-1">${item.tyreNumber}</h5>
+                                <span class="badge bg-${getReasonBadgeColor(item.scrapReason)}">${getReasonText(item.scrapReason)}</span>
+                            </div>
+                            <div class="mb-2">
+                                <strong>Equipment:</strong> ${item.equipment} | 
+                                <strong>Position:</strong> ${item.position}
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div><strong>STT KMR:</strong> ${item.sttKmr || 'N/A'}</div>
+                                    <div><strong>STT HMR:</strong> ${item.sttHmr || 'N/A'}</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div><strong>Close KMR:</strong> ${item.closeKmr || 'N/A'}</div>
+                                    <div><strong>Close HMR:</strong> ${item.closeHmr || 'N/A'}</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div><strong>Issue Date:</strong> ${formatDate(item.issueDate)}</div>
+                                    <div><strong>Removal Date:</strong> ${formatDate(item.removalDate)}</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div><strong>Efficiency:</strong> ${item.efficiency || 'N/A'}</div>
+                                </div>
+                            </div>
+                            ${item.notes ? `<div class="mt-2"><strong>Notes:</strong> ${item.notes}</div>` : ''}
+                        </div>
+                    `;
+                });
+                
+                scrapTyreListDiv.innerHTML = scrapHTML;
+                
+                // Also update the reuse dropdown
+                updateScrapTyreDropdown(scrapTyres);
+            }
+            
+            function updateScrapTyreDropdown(scrapTyres) {
+                scrapTyreSelect.innerHTML = '<option value="">-- Select Tyre --</option>';
+                
+                scrapTyres.forEach(tyre => {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify(tyre);
+                    option.textContent = `${tyre.tyreNumber} (${tyre.equipment} - ${tyre.position}) - ${getReasonText(tyre.scrapReason)}`;
+                    scrapTyreSelect.appendChild(option);
+                });
+            }
+            
+            function getEquipmentDataForEquipment(equipmentId) {
+                const defaultData = {
+                    "FR-LEFT": { current: null, history: [] },
+                    "FR-RIGHT": { current: null, history: [] },
+                    "CLI": { current: null, history: [] },
+                    "CLO": { current: null, history: [] },
+                    "CRI": { current: null, history: [] },
+                    "CRO": { current: null, history: [] },
+                    "BLI": { current: null, history: [] },
+                    "BLO": { current: null, history: [] },
+                    "BRI": { current: null, history: [] },
+                    "BRO": { current: null, history: [] }
+                };
+                
+                const storedData = localStorage.getItem(`tyres_${equipmentId}`);
+                if (storedData) {
+                    return JSON.parse(storedData);
+                }
+                
+                return defaultData;
+            }
+           
+            function resetTyreForm() {
+                tyreNumberInput.value = generateTyreNumber();
+                issueDateInput.valueAsDate = new Date();
+                sttKmrInput.value = '';
+                sttHmrInput.value = '';
+                closeKmrInput.value = '';
+                closeHmrInput.value = '';
+                scrapReasonSelect.value = '';
+                notesInput.value = '';
+                photoPreviewsDiv.innerHTML = '';
+                currentHmrKmrPhoto = null;
+                currentOldTyrePhoto = null;
+                
+                reuseSttKmrInput.value = '';
+                reuseSttHmrInput.value = '';
+                reuseCloseKmrInput.value = '';
+                reuseCloseHmrInput.value = '';
+                reuseNotesInput.value = '';
+                efficiencyDisplayDiv.style.display = 'none';
+            }
+           
+            function handlePhotoPreview(event, type) {
+                const file = event.target.files[0];
+                if (!file) return;
+               
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (type === 'hmrKmr') {
+                        currentHmrKmrPhoto = e.target.result;
+                    } else {
+                        currentOldTyrePhoto = e.target.result;
+                    }
+                   
+                    // Show preview
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'photo-preview';
+                    img.alt = type === 'hmrKmr' ? 'HMR/KMR Photo' : 'Old Tyre Photo';
+                    photoPreviewsDiv.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+           
+            function validateTyreForm() {
+                if (!tyreNumberInput.value.trim()) {
+                    alert('Please enter a tyre number');
+                    return false;
+                }
+               
+                if (!issueDateInput.value) {
+                    alert('Please select an issue date');
+                    return false;
+                }
+               
+                if (!sttKmrInput.value) {
+                    alert('Please enter STT KMR');
+                    return false;
+                }
+               
+                if (!sttHmrInput.value) {
+                    alert('Please enter STT HMR');
+                    return false;
+                }
+               
+                if (!scrapReasonSelect.value) {
+                    alert('Please select a reason for replacement');
+                    return false;
+                }
+               
+                return true;
+            }
+           
+            function saveTyreData() {
+                const equipmentData = getEquipmentData();
+                const currentTyre = equipmentData[selectedPosition].current;
+               
+                // If there's a current tyre, move it to history
+                if (currentTyre) {
+                    if (!equipmentData[selectedPosition].history) {
+                        equipmentData[selectedPosition].history = [];
+                    }
+                   
+                    // Add removal date to the current tyre
+                    currentTyre.removalDate = new Date().toISOString();
+                    currentTyre.removalReason = scrapReasonSelect.value;
+                    equipmentData[selectedPosition].history.unshift(currentTyre);
+                }
+               
+                // Calculate efficiency
+                const efficiency = calculateEfficiency(
+                    parseInt(sttKmrInput.value),
+                    parseInt(sttHmrInput.value),
+                    closeKmrInput.value ? parseInt(closeKmrInput.value) : null,
+                    closeHmrInput.value ? parseInt(closeHmrInput.value) : null
+                );
+               
+                // Create new tyre object
+                const newTyre = {
+                    tyreNumber: tyreNumberInput.value.trim(),
+                    issueDate: new Date(issueDateInput.value).toISOString(),
+                    sttKmr: parseInt(sttKmrInput.value),
+                    sttHmr: parseInt(sttHmrInput.value),
+                    closeKmr: closeKmrInput.value ? parseInt(closeKmrInput.value) : null,
+                    closeHmr: closeHmrInput.value ? parseInt(closeHmrInput.value) : null,
+                    efficiency: efficiency.efficiency,
+                    scrapReason: scrapReasonSelect.value,
+                    notes: notesInput.value,
+                    hmrKmrPhoto: currentHmrKmrPhoto,
+                    oldTyrePhoto: currentOldTyrePhoto
+                };
+               
+                // Set as current tyre
+                equipmentData[selectedPosition].current = newTyre;
+               
+                // Save to localStorage
+                saveEquipmentData(equipmentData);
+               
+                // Update display
+                loadTyreData();
+                showCurrentTyreInfo();
+               
+                alert('Tyre information saved successfully!');
+            }
+            
+            function showForm(action) {
+                currentAction = action;
+                
+                // Hide all form sections
+                document.querySelectorAll('.form-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                // Show the selected form section
+                if (action === 'selection') {
+                    // Show only the action cards
+                    document.querySelector('.modal-body > .mb-4').style.display = 'block';
+                    saveTyreBtn.style.display = 'none';
+                } else if (action === 'add') {
+                    document.querySelector('.modal-body > .mb-4').style.display = 'none';
+                    document.getElementById('newTyreForm').style.display = 'block';
+                    saveTyreBtn.style.display = 'block';
+                    saveTyreBtn.textContent = 'Save New Tyre';
+                } else if (action === 'move') {
+                    document.querySelector('.modal-body > .mb-4').style.display = 'none';
+                    setupMoveTyreForm();
+                    document.getElementById('moveTyreForm').style.display = 'block';
+                    saveTyreBtn.style.display = 'none';
+                } else if (action === 'reuse') {
+                    document.querySelector('.modal-body > .mb-4').style.display = 'none';
+                    document.getElementById('reuseTyreForm').style.display = 'block';
+                    saveTyreBtn.style.display = 'none';
+                }
+            }
+           
+            function setupMoveTyreForm() {
+                const equipmentData = getEquipmentData();
+                const currentTyre = equipmentData[selectedPosition].current;
+               
+                if (!currentTyre) {
+                    alert('No tyre to move from this position');
+                    showForm('selection');
+                    return;
+                }
+               
+                // Show current tyre info
+                selectedTyreNumberSpan.textContent = currentTyre.tyreNumber;
+                selectedPositionSpanMove.textContent = selectedPosition;
+               
+                // Populate target positions
+                targetPositionsContainer.innerHTML = '';
+                targetPosition = null;
+               
+                const positions = ["FR-LEFT", "FR-RIGHT", "CLI", "CLO", "CRI", "CRO", "BLI", "BLO", "BRI", "BRO"];
+               
+                positions.forEach(position => {
+                    if (position !== selectedPosition) {
+                        const positionOption = document.createElement('div');
+                        positionOption.className = 'position-option';
+                        positionOption.textContent = position;
+                       
+                        // Show the tyre number at the target position if it exists
+                        if (equipmentData[position].current) {
+                            positionOption.textContent += ` (${equipmentData[position].current.tyreNumber})`;
+                        } else {
+                            positionOption.textContent += ' (Empty)';
+                        }
+                       
+                        positionOption.setAttribute('data-target', position);
+                       
+                        positionOption.addEventListener('click', function() {
+                            // Remove any previous selection
+                            document.querySelectorAll('.position-option').forEach(opt => {
+                                opt.style.backgroundColor = '#e9ecef';
+                                opt.style.color = '';
+                            });
+                           
+                            // Highlight selected option
+                            this.style.backgroundColor = '#3498db';
+                            this.style.color = 'white';
+                           
+                            targetPosition = this.getAttribute('data-target');
+                        });
+                       
+                        targetPositionsContainer.appendChild(positionOption);
+                    }
+                });
+            }
+           
+            function moveTyre(fromPosition, toPosition) {
+                const equipmentData = getEquipmentData();
+               
+                // Get the tyre data
+                const fromTyre = {...equipmentData[fromPosition].current};
+                const toTyre = {...equipmentData[toPosition].current};
+               
+                // Swap the tyres
+                equipmentData[fromPosition].current = toTyre;
+                equipmentData[toPosition].current = fromTyre;
+               
+                // Save to localStorage
+                saveEquipmentData(equipmentData);
+               
+                // Update the UI
+                document.getElementById(`position-${fromPosition}-number`).textContent = toTyre ? toTyre.tyreNumber : '';
+                document.getElementById(`position-${toPosition}-number`).textContent = fromTyre ? fromTyre.tyreNumber : '';
+               
+                // Update position styles
+                const fromPositionElement = document.querySelector(`[data-position="${fromPosition}"]`);
+                const toPositionElement = document.querySelector(`[data-position="${toPosition}"]`);
+               
+                fromPositionElement.classList.remove('empty', 'blasted');
+                toPositionElement.classList.remove('empty', 'blasted');
+               
+                if (!toTyre) {
+                    fromPositionElement.classList.add('empty');
+                } else if (toTyre.scrapReason === "blast") {
+                    fromPositionElement.classList.add('blasted');
+                }
+               
+                if (!fromTyre) {
+                    toPositionElement.classList.add('empty');
+                } else if (fromTyre.scrapReason === "blast") {
+                    toPositionElement.classList.add('blasted');
+                }
+               
+                // Calculate running totals
+                calculateRunningTotals(equipmentData);
+               
+                // Show success message
+                if (fromTyre) {
+                    alert(`Tyre ${fromTyre.tyreNumber} moved from position ${fromPosition} to position ${toPosition}`);
+                }
+            }
+            
+            function reuseTyre() {
+                const selectedTyre = JSON.parse(scrapTyreSelect.value);
+                const equipmentData = getEquipmentData();
+                const currentTyre = equipmentData[selectedPosition].current;
+                
+                // If there's a current tyre, move it to history
+                if (currentTyre) {
+                    if (!equipmentData[selectedPosition].history) {
+                        equipmentData[selectedPosition].history = [];
+                    }
+                    
+                    // Add removal date to the current tyre
+                    currentTyre.removalDate = new Date().toISOString();
+                    currentTyre.removalReason = "replaced";
+                    equipmentData[selectedPosition].history.unshift(currentTyre);
+                }
+                
+                // Calculate efficiency for reused tyre
+                const efficiency = calculateEfficiency(
+                    parseInt(reuseSttKmrInput.value),
+                    parseInt(reuseSttHmrInput.value),
+                    reuseCloseKmrInput.value ? parseInt(reuseCloseKmrInput.value) : null,
+                    reuseCloseHmrInput.value ? parseInt(reuseCloseHmrInput.value) : null
+                );
+                
+                // Create reused tyre object
+                const reusedTyre = {
+                    tyreNumber: selectedTyre.tyreNumber,
+                    issueDate: new Date(reuseIssueDateInput.value).toISOString(),
+                    sttKmr: parseInt(reuseSttKmrInput.value),
+                    sttHmr: parseInt(reuseSttHmrInput.value),
+                    closeKmr: reuseCloseKmrInput.value ? parseInt(reuseCloseKmrInput.value) : null,
+                    closeHmr: reuseCloseHmrInput.value ? parseInt(reuseCloseHmrInput.value) : null,
+                    efficiency: efficiency.efficiency,
+                    scrapReason: "reused",
+                    notes: `Reused from scrap. ${reuseNotesInput.value}`,
+                    previousHistory: selectedTyre
+                };
+                
+                // Set as current tyre
+                equipmentData[selectedPosition].current = reusedTyre;
+                
+                // Save to localStorage
+                saveEquipmentData(equipmentData);
+                
+                // Update display
+                loadTyreData();
+                showCurrentTyreInfo();
+                
+                alert(`Tyre ${selectedTyre.tyreNumber} reused successfully!`);
+            }
+           
+            function formatDate(dateString) {
+                if (!dateString) return 'N/A';
+                const date = new Date(dateString);
+                return date.toLocaleDateString();
+            }
+           
+            function getReasonText(reason) {
+                const reasons = {
+                    'blast': 'Blast',
+                    'puncture': 'Puncture',
+                    'damaged': 'Damaged',
+                    'wear': 'Normal Wear',
+                    'other': 'Other',
+                    'reused': 'Reused'
+                };
+               
+                return reasons[reason] || reason;
+            }
+            
+            function getReasonBadgeColor(reason) {
+                const colors = {
+                    'blast': 'danger',
+                    'puncture': 'warning',
+                    'damaged': 'info',
+                    'wear': 'secondary',
+                    'other': 'dark',
+                    'reused': 'success'
+                };
+                
+                return colors[reason] || 'primary';
+            }
+           
+            // Initialize with default equipment for demonstration
+            equipmentSelect.value = "AP39UUQ095";
+            selectedEquipment = "AP39UUQ095";
+            loadTyreData();
+            
+            // Load scrap tyres on page load
+            loadScrapTyres('', '');
+        });
+    </script>
+</body>
+</html>
